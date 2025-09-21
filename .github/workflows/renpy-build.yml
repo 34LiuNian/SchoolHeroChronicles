@@ -39,6 +39,14 @@ jobs:
           RENPY_DISABLE_FULLSCREEN: 1
           RENPY_SKIP_UPDATE: 1
 
+      - name: Debug WEB_PATH (web only)
+        if: matrix.package == 'web'
+        run: |
+          echo "Attempting to locate WEB_PATH related files" 
+          find . -maxdepth 3 -type f -name 'web_build_patch.rpy' -print || true
+          echo "List dist after build:" 
+          ls -R dist | head -100
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
