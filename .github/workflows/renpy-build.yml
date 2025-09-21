@@ -29,7 +29,7 @@ jobs:
       - name: Build VN project
         uses: ProjectAliceDev/renpy-build-action@v1.3.0
         with:
-          # sdk-version: '8.2.0'           # 可按项目实际 SDK 版本调整
+          sdk-version: '8.2.0'           # 指定使用 Ren'Py 8（Python3），避免默认回退到 7.3.2
           project-dir: '.'               # 根目录（包含 game/）
           package: ${{ matrix.package }} # 针对当前矩阵平台构建
         env:
