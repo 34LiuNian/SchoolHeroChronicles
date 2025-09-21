@@ -1,0 +1,79 @@
+name: Build Ren'Py Distributables
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: ["win", "mac", "linux", "web"]  # 增加 web 平台
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache Ren'Py SDK
+        id: cache-renpy
+        uses: actions/cache@v4
+        with:
+            path: ~/.renpy
+            key: renpy-sdk-${{ runner.os }}-8-2-0
+            restore-keys: |
+              renpy-sdk-${{ runner.os }}-
+
+      - name: Build VN project
+        uses: ProjectAliceDev/renpy-build-action@v1.3.0
+        with:
+          # sdk-version: '8.2.0'           # 可按项目实际 SDK 版本调整
+          project-dir: '.'               # 根目录（包含 game/）
+          package: ${{ matrix.package }} # 针对当前矩阵平台构建
+        env:
+          SDL_AUDIODRIVER: dummy
+          SDL_VIDEODRIVER: dummy
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.package }}
+          path: dist
+          if-no-files-found: error
+
+  deploy-web:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download web artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-web
+          path: web-dist
+
+      - name: Prepare web folder
+        run: |
+          # web-dist 里存放的是 dist 下的内容；若需要重命名可以在这里处理
+          ls -R web-dist
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web-dist
+
+  publish-pages:
+    needs: deploy-web
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
