@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        package: ["win", "mac", "linux", "web"]  # 增加 web 平台
+        package: ["web"]  # "win", "mac", "linux"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,6 +35,9 @@ jobs:
         env:
           SDL_AUDIODRIVER: dummy
           SDL_VIDEODRIVER: dummy
+          RENPY_FORCE_SOFTWARE_RENDER: 1
+          RENPY_DISABLE_FULLSCREEN: 1
+          RENPY_SKIP_UPDATE: 1
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4

@@ -80,7 +80,7 @@ init python:
         if char_id not in affection:
             affection[char_id] = 0
         affection[char_id] += value
-    _log("affection[{char_id}] -> {val}".format(char_id=char_id, val=affection[char_id]))
+        _log("affection[{char_id}] -> {val}".format(char_id=char_id, val=affection[char_id]))
 
     def next_day():
         """推进日期。到达 7 结束则进入下一周。"""
@@ -90,7 +90,7 @@ init python:
         if current_day > 7:
             current_day = 1
             current_week += 1
-    _log("Advance to week {week} day {day}".format(week=current_week, day=current_day))
+        _log("Advance to week {week} day {day}".format(week=current_week, day=current_day))
 
     def _check_stress_break():
         if stress >= STRESS_BREAKPOINT:
