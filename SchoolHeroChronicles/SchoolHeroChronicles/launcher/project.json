@@ -1,0 +1,46 @@
+{
+  "name": "School Hero Chronicles",
+  "version": "1.0",
+  "description": "A visual novel game that explores the life of high school students navigating friendships, challenges, and personal growth.",
+  "author": "Your Name",
+  "license": "MIT",
+  "game_directory": "game",
+  "script_files": [
+    "script/prologue.rpy",
+    "script/week_01.rpy",
+    "script/week_02.rpy",
+    "script/week_03.rpy",
+    "script/week_04.rpy"
+  ],
+  "character_files": [
+    "characters/definitions.rpy",
+    "characters/expressions.rpy"
+  ],
+  "data_files": [
+    "data/flags.rpy",
+    "data/routes.rpy"
+  ],
+  "gui_files": [
+    "gui/gui.rpy",
+    "gui/theme"
+  ],
+  "audio_files": {
+    "bgm": "audio/bgm",
+    "sfx": "audio/sfx"
+  },
+  "image_files": {
+    "backgrounds": "images/backgrounds",
+    "sprites": "images/sprites"
+  },
+  "screen_files": [
+    "screens/main_menu.rpy",
+    "screens/overlays.rpy",
+    "screens.rpy"
+  ],
+  "translation_files": {
+    "zh_CN": "translations/zh_CN"
+  },
+  "options_file": "options.rpy",
+  "main_script_file": "script.rpy",
+  "tl_file": "tl.rpy"
+}

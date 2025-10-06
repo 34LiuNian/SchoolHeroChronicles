@@ -26,8 +26,14 @@ default schedule_phase = "idle"     # 当前阶段：idle / study / exam / free 
 
 ## 角色好感（按代号键值）—— 初期只有占位，后面扩展
 default affection = {
-    "erin": 0,   # 示例：艾琳（占位）
+    "limuyun": 0,   # 李慕云
 }
+
+## 李慕云线关键选择标记
+default limuyun_week2_accepted_invitation = False  # Week 2是否接受家访邀请
+default limuyun_week3_helped = False               # Week 3是否提供有效帮助
+default limuyun_week2_arcade_visited = False       # Week 2是否去了电玩城
+default limuyun_noticed_bruises = 0                # 注意到伤痕的次数
 
 ## 已解锁的结局标记（集合/列表）
 default unlocked_endings = set()
@@ -35,7 +41,8 @@ default unlocked_endings = set()
 ## 测试统计/日志（调试用，可后期移除或加 dev flag）
 default debug_log = []
 
-## ------------------------------
+## 当前进行的角色线路
+default current_route = None  # None / "limuyun" / 其他## ------------------------------
 ## 工具函数区域
 init python:
     import random
@@ -69,9 +76,7 @@ init python:
             raise Exception("未知学习方式: " + str(choice))
 
         subject_skill += gain
-        _log("[DAY {week}-{day}] choice={choice} passed={passed} +{gain} skill, stress={stress}".format(
-            week=current_week, day=current_day, choice=choice, passed=passed, gain=gain, stress=stress
-        ))
+        _log(f"[DAY {current_week}-{current_day}] choice={choice} passed={passed} +{gain} skill, stress={stress}")
         _check_stress_break()
         return {"passed": passed, "gained": gain, "choice": choice}
 
@@ -80,7 +85,7 @@ init python:
         if char_id not in affection:
             affection[char_id] = 0
         affection[char_id] += value
-        _log("affection[{char_id}] -> {val}".format(char_id=char_id, val=affection[char_id]))
+        _log(f"affection[{char_id}] -> {affection[char_id]}")
 
     def next_day():
         """推进日期。到达 7 结束则进入下一周。"""
@@ -90,7 +95,7 @@ init python:
         if current_day > 7:
             current_day = 1
             current_week += 1
-        _log("Advance to week {week} day {day}".format(week=current_week, day=current_day))
+        _log(f"Advance to week {current_week} day {current_day}")
 
     def _check_stress_break():
         if stress >= STRESS_BREAKPOINT:
@@ -110,6 +115,25 @@ init python:
 
     def can_character_route(char_id):
         return affection.get(char_id, 0) >= AFFECTION_ENDING_THRESHOLD and evaluate_academic_result() != "expelled"
+    
+    def get_week_label():
+        """返回当前周对应的剧情入口 label 名称。"""
+        if current_week == 1:
+            return "week1_limuyun"
+        elif current_week == 2:
+            return "week2_limuyun"
+        elif current_week == 3:
+            return "week3_limuyun"
+        elif current_week == 4:
+            return "week4_ending"
+        else:
+            return None
+    
+    def start_limuyun_route():
+        """开始李慕云线路。"""
+        global current_route
+        current_route = "limuyun"
+        _log("Started Li Muyun route")
 
 ## ------------------------------
 ## 结局 / 强制结束 label（测试用占位）
