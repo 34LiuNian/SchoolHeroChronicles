@@ -24,7 +24,7 @@ jobs:
           SDL_VIDEODRIVER: dummy
       
       - name: Upload Web Build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: renpy-web-build
           path: game/*.zip  # Web 构建输出
