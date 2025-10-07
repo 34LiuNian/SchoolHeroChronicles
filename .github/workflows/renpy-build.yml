@@ -75,7 +75,7 @@ jobs:
           name: renpy-builds
           path: dist
 
-      - name: Unzip web package
+      - name: Unzip web package and Verify
         run: |
           # 找到 web 包并解压
           WEB_PACKAGE=$(find dist -name '*-web.zip' | head -n 1)
@@ -83,10 +83,23 @@ jobs:
             echo "Web package not found!"
             exit 1
           fi
+          echo "Found web package: $WEB_PACKAGE"
+          
           unzip "$WEB_PACKAGE" -d game-web
+          
           # 将解压后的内容移动到顶层，以便 Pages 部署
+          # Ren'Py 会创建一个类似 'ProjectName-1.0-web' 的目录
           WEB_CONTENT_DIR=$(find game-web -mindepth 1 -maxdepth 1 -type d)
+          if [ -z "$WEB_CONTENT_DIR" ]; then
+            echo "Unzipped content directory not found!"
+            exit 1
+          fi
+          echo "Moving content from $WEB_CONTENT_DIR to root"
           mv $WEB_CONTENT_DIR/* .
+          
+          echo "--- File structure before uploading to Pages ---"
+          ls -laR
+          echo "------------------------------------------------"
           
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v4
