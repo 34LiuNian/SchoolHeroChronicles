@@ -10,7 +10,8 @@ screen main_menu():
     if gui.show_name:
         vbox:
             style "main_menu_vbox"
-            text "School Hero Chronicles" at title_position
+            text "School Hero Chronicles":
+                style "main_menu_title"
             text "[config.version]":
                 style "main_menu_version"
 
