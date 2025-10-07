@@ -44,13 +44,58 @@ jobs:
       
       - name: List Generated Files
         run: |
-          ls -la *.zip *.tar.bz2 || echo "No build files found"
+          # 在项目根目录中查找构建文件
+          find . -name "*.zip" -o -name "*.tar.bz2"
       
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: renpy-builds
+          # 从整个工作区查找文件
           path: |
-            *.zip
-            *.tar.bz2
+            **/*.zip
+            **/*.tar.bz2
           if-no-files-found: warn
+
+  deploy-pages:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download web build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: renpy-builds
+          path: dist
+
+      - name: Unzip web package
+        run: |
+          # 找到 web 包并解压
+          WEB_PACKAGE=$(find dist -name '*-web.zip' | head -n 1)
+          if [ -z "$WEB_PACKAGE" ]; then
+            echo "Web package not found!"
+            exit 1
+          fi
+          unzip "$WEB_PACKAGE" -d game-web
+          # 将解压后的内容移动到顶层，以便 Pages 部署
+          WEB_CONTENT_DIR=$(find game-web -mindepth 1 -maxdepth 1 -type d)
+          mv $WEB_CONTENT_DIR/* .
+          
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
